@@ -21,15 +21,14 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 % Titlepage
 \maketitle
 
 % Rnw options need to be set to knitr, not to Sweave!!
 % knitr setup:
 <<setup, include=FALSE, cache=FALSE>>=
-  # set right working directory
-  setwd("../case1")
-
+  
   # use package knitr and read in used R code,
   # which is in the file case1.R for better overview
   require(knitr)
@@ -73,10 +72,16 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 \end{figure}
 
 \chapter{Pre-processing}
-
-
+\section{PLS} % Lars
 
 \chapter{Modeling}
+\section{Cross validation \& Majority Vote} % 
+\section{KNN} % Kasper
+\section{Logistic regression} % Lars
+\section{SVM} % Maya
+\section{CART} % 
+
+
 
 \chapter{Dimensions}
 
