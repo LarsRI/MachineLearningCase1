@@ -8,6 +8,7 @@ library(e1071)
 library(pls)
 library(rpart)
 
+
 KNNfn <- function(xTrain, yTrain, xTest, yTest, nNeighbours)
 {
     errKNNcv <- numeric(nNeighbours)
