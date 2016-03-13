@@ -19,15 +19,6 @@ KNNfn <- function(xTrain, yTrain, xTest, yTest, nNeighbours)
     }
     K <- max(which(errKNNcv == min(errKNNcv))) # The simplest model is the one with the most neighbours
     
-#    for (K in seq_len(nNeighbours))
-#    {
-#        KNNpred <- knn(train = xTrain, test = xTest, cl = yTrain, k = K)
-#        errKNN[K] <- sum(as.integer(KNNpred != yTest))
-#    }
-#    errKNN <- errKNN / length(yTest)
-#    names(errKNN) <- paste0("KNN_", seq_len(nNeighbours))
-    
-    
     KNNpred <- knn(train = xTrain, test = xTest, cl = yTrain, k = K)
     errKNN <- sum(as.integer(KNNpred != yTest))
     names(errKNN) <- "KNN"
