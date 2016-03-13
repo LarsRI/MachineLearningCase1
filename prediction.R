@@ -1,18 +1,38 @@
 load("preprocessed.RData")
+library(reshape2)
+library(data.table)
+library(cvTools)
+library(class)
+library(nnet)
+library(e1071)
+library(pls)
+library(rpart)
 
 KNNfn <- function(xTrain, yTrain, xTest, yTest, nNeighbours)
 {
-    errKNN <- numeric(nNeighbours)
+    errKNNcv <- numeric(nNeighbours)
+    # Use leave one out CV of train set to select number of neighbours
     for (K in seq_len(nNeighbours))
     {
-        KNNpred <- knn(train = xTrain, test = xTest, cl = yTrain, k = K)
-        errKNN[K] <- sum(as.integer(KNNpred != yTest))
+      KNNpred <- knn.cv(train = xTrain, cl = yTrain, k = K)
+      errKNNcv[K] <- sum(as.integer(KNNpred != yTrain))
     }
-    errKNN <- errKNN / length(yTest)
-    names(errKNN) <- paste0("KNN_", seq_len(nNeighbours))
+    K <- max(which(errKNNcv == min(errKNNcv))) # The simplest model is the one with the most neighbours
     
-    K <- which.min(errKNN)
+#    for (K in seq_len(nNeighbours))
+#    {
+#        KNNpred <- knn(train = xTrain, test = xTest, cl = yTrain, k = K)
+#        errKNN[K] <- sum(as.integer(KNNpred != yTest))
+#    }
+#    errKNN <- errKNN / length(yTest)
+#    names(errKNN) <- paste0("KNN_", seq_len(nNeighbours))
+    
+    
     KNNpred <- knn(train = xTrain, test = xTest, cl = yTrain, k = K)
+    errKNN <- sum(as.integer(KNNpred != yTest))
+    names(errKNN) <- "KNN"
+    
+    print(K)
     
     list(errorRate = errKNN, predictions = KNNpred)
 }
@@ -40,6 +60,19 @@ svmFn <- function(xTrain, yTrain, xTest, yTest){
     names(errSVM) <- "SVM"
     
     list(errorRate = errSVM, predictions = svmPred)
+}
+
+cartFn <- function(xTrain, yTrain, xTest, yTest)
+{
+    dat <- data.frame(y = yTrain, unclass(xTrain))
+    model <- rpart(y ~ ., data = dat, method = "class")
+    pfit<- prune(model, cp= model$cptable[which.min(model$cptable[,"xerror"]),"CP"])
+    
+    cartPred <- predict(pfit, newdata = data.frame(xTest), type = c("class"))
+    errCart <- sum(cartPred != yTest) / length(yTest)
+    names(errCart) <- "CART"
+    
+    list(errorRate = errCart, predictions = cartPred)
 }
 
 doTest <- function(dataObject, f, ...)
@@ -70,5 +103,6 @@ getMeanErrorRates <- function(dataList)
 dataList <- lapply(dataList, doTest, KNNfn, nNeighbours = 20)
 dataList <- lapply(dataList, doTest, logisticRegressionFn)
 dataList <- lapply(dataList, doTest, svmFn)
+dataList <- lapply(dataList, doTest, cartFn)
 
 getMeanErrorRates(dataList)

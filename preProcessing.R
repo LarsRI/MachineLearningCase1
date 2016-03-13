@@ -5,6 +5,8 @@ library(class)
 library(nnet)
 library(e1071)
 library(pls)
+library(rpart)
+
 
 load("Case1.RData")
 
