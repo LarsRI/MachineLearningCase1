@@ -21,7 +21,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+% \SweaveOpts{concordance=TRUE}
 % Titlepage
 \maketitle
 
@@ -85,7 +85,12 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 
 \chapter{Dimensions}
 
-test
+\chapter{Test}
+<<chunkname, echo=FALSE, comment=NA, fig.height=3, fig.width=5>>=
+@
+
+<<chunkname, echo=TRUE, comment=NA, fig.height=3, fig.width=5>>=
+@
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%% APPENDIX %%%%%
