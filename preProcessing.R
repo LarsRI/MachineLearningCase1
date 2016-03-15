@@ -52,7 +52,7 @@ rotateData <- function(xTrain, yTrain, xTest, yTest)
     plsShuf <- plsr(as.matrix(y) ~ xShuf)
     cutOff <- max(explvar(plsShuf))
     
-    nComp <- sum(explvar(pls) > cutOff)
+    nComp <- max(which(explvar(pls) > cutOff))
     pls2 <- plsr(as.matrix(y) ~ xTrain, ncomp = nComp)
     # Select only components with a higher explained variance
     xTrainRot <- pls2$scores

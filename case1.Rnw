@@ -21,7 +21,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-% \SweaveOpts{concordance=TRUE}
+%\SweaveOpts{concordance=TRUE}
 % Titlepage
 \maketitle
 
@@ -72,14 +72,17 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 \end{figure}
 
 \chapter{Pre-processing}
+\section{Cross validation} % Lars
 \section{PLS} % Lars
 
 \chapter{Modeling}
-\section{Cross validation \& Majority Vote} % 
 \section{KNN} % Kasper
 \section{Logistic regression} % Lars
 \section{SVM} % Maya
 \section{CART} % 
+\section{Boosting} % 
+\section{Random Forest} % 
+\section{Majority Vote} % 
 
 
 
