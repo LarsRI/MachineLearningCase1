@@ -44,7 +44,7 @@ Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\
 
 Please note that the deadline is mid-day.
 
-\chapter{Introduction}
+\chapter{Introduction} % Kasper
 
 There are three sensors on an offshore platform, that record data for detecting damage to the platform. Damage can occur at three different sites (see table \ref{table:damageclass}) and for three different intensities ($5\%, 10\%, 15\%$). The recorded data is given in the form of Frequency Response Functions (FRFs).
 
@@ -79,14 +79,12 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 \section{KNN} % Kasper
 \section{Logistic regression} % Lars
 \section{SVM} % Maya
-\section{CART} % 
-\section{Boosting} % 
-\section{Random Forest} % 
+\section{CART} % Maja
+\section{Boosting} % Kasper
+\section{Random Forest} % Lars
 \section{Majority Vote} % 
 
-
-
-\chapter{Dimensions}
+\chapter{Dimensions} %
 
 \chapter{Test}
 <<chunkname, echo=FALSE, comment=NA, fig.height=3, fig.width=5>>=

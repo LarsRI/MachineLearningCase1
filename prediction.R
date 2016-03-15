@@ -17,7 +17,8 @@ KNNfn <- function(xTrain, yTrain, xTest, yTest, nNeighbours)
       KNNpred <- knn.cv(train = xTrain, cl = yTrain, k = K)
       errKNNcv[K] <- sum(as.integer(KNNpred != yTrain))
     }
-    K <- max(which(errKNNcv == min(errKNNcv))) # The simplest model is the one with the most neighbours
+    # The simplest model is the one with the most neighbours
+    K <- max(which(errKNNcv == min(errKNNcv))) 
     
     KNNpred <- knn(train = xTrain, test = xTest, cl = yTrain, k = K)
     errKNN <- sum(as.integer(KNNpred != yTest))
@@ -95,5 +96,6 @@ dataList <- lapply(dataList, doTest, KNNfn, nNeighbours = 20)
 dataList <- lapply(dataList, doTest, logisticRegressionFn)
 dataList <- lapply(dataList, doTest, svmFn)
 dataList <- lapply(dataList, doTest, cartFn)
+
 
 getMeanErrorRates(dataList)
