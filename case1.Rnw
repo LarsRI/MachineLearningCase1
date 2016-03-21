@@ -38,7 +38,7 @@
   load("Case1.RData")
 
   # preload other packages
-  require(data.table)
+  require(xtable)
 @
 
 Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\rbrace$ as one long vector with newline separating the observations. The corresponding order is that given in the \mbox{Cas1\_tst} (Xt), and a small report with a brief introduction/abstract, pre-processing, modeling and model assessment, plus your evaluation of the actual dimensions needed to describe the data/problem.
@@ -77,25 +77,41 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 \section{PLS} % Lars
 
 \chapter{Modeling}
+% These are not included, but are needed for reference
+<<startprediction, include=FALSE, echo=FALSE, warning=FALSE>>=
+@
 
 In the following sections we will look into different models. The final damage class will then be chosen based on a majority vote of the models.
 
 \section{KNN} % Kasper
+<<knn, echo=TRUE>>=
+@
+
 \section{Logistic regression} % Lars
+<<logreg, echo=TRUE>>=
+@
+
 \section{SVM} % Maya
-\section{CART} % Maja
+
+We used a support vector machine with a linear kernel to build a model from the training data. Then, classes for the test data were predicted and the error rate calculated. The mean error rate for this model was $0.00$, see table \ref{table:meanerror}. For the given training and test data and pre-processing, the SVM is performing very well.
+<<svm, echo=TRUE>>=
+@
+
+\section{CART} % Maya
+<<cart, echo=TRUE>>=
+@
+
 \section{Boosting} % Kasper
 \section{Random Forest} % Lars
 \section{Majority Vote} % 
+<<vote, echo=TRUE, results='hide'>>=
+@
+
+<<meanerror, echo=FALSE, results='asis'>>=
+@
 
 \chapter{Dimensions} %
 
-\chapter{Test}
-<<chunkname, echo=FALSE, comment=NA, fig.height=3, fig.width=5>>=
-@
-
-<<chunkname, echo=TRUE, comment=NA, fig.height=3, fig.width=5>>=
-@
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%% APPENDIX %%%%%

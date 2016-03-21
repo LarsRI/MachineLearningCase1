@@ -1,3 +1,4 @@
+## ---- startprediction
 load("preprocessed.RData")
 library(reshape2)
 library(data.table)
@@ -8,6 +9,7 @@ library(e1071)
 library(pls)
 library(rpart)
 
+## ---- knn
 KNNfn <- function(xTrain, yTrain, xTest, yTest, nNeighbours)
 {
     errKNNcv <- numeric(nNeighbours)
@@ -29,6 +31,7 @@ KNNfn <- function(xTrain, yTrain, xTest, yTest, nNeighbours)
     list(errorRate = errKNN, predictions = KNNpred)
 }
 
+## ---- logreg
 logisticRegressionFn <- function(xTrain, yTrain, xTest, yTest){
     maxVal <- max(abs(xTrain))
     dat <- data.frame(y = yTrain, unclass(xTrain/maxVal))
@@ -42,6 +45,7 @@ logisticRegressionFn <- function(xTrain, yTrain, xTest, yTest){
     list(errorRate = errLogit, predictions = logitPred)
 }
 
+## ---- svm
 svmFn <- function(xTrain, yTrain, xTest, yTest){
     dat <- data.frame(y = yTrain, unclass(xTrain))
     colnames(dat) <- c('y', colnames(xTrain))
@@ -54,6 +58,7 @@ svmFn <- function(xTrain, yTrain, xTest, yTest){
     list(errorRate = errSVM, predictions = svmPred)
 }
 
+## ---- cart
 cartFn <- function(xTrain, yTrain, xTest, yTest)
 {
     dat <- data.frame(y = yTrain, unclass(xTrain))
@@ -67,6 +72,7 @@ cartFn <- function(xTrain, yTrain, xTest, yTest)
     list(errorRate = errCart, predictions = cartPred)
 }
 
+## ---- vote
 doTest <- function(dataObject, f, ...)
 {
     name = as.character(substitute(f))
@@ -78,8 +84,10 @@ doTest <- function(dataObject, f, ...)
 
 majorityVote <- function(dataObject)
 {
-    dataObject$predictions$majorityVote <- apply(dataObject$predictions, 1, function(x)names(which.max(table(x))))
-    dataObject$errorRate["majorityVote"] <- sum(dataObject$predictions$majorityVote != dataObject$data$yTest)
+    dataObject$predictions$majorityVote <- apply(
+      dataObject$predictions, 1, function(x)names(which.max(table(x))))
+    dataObject$errorRate["majorityVote"] <- sum(
+      dataObject$predictions$majorityVote != dataObject$data$yTest)
     dataObject
 }
 
@@ -99,3 +107,9 @@ dataList <- lapply(dataList, doTest, cartFn)
 
 
 getMeanErrorRates(dataList)
+
+## ---- meanerror
+
+df  = xtable(as.table(getMeanErrorRates(dataList)))
+caption(df) = "Mean error rates for different models.\\label{table:meanerror}"
+print(df)

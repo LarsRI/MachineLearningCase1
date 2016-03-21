@@ -114,50 +114,165 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 \section{PLS} % Lars
 
 \chapter{Modeling}
+% These are not included, but are needed for reference
+
 
 In the following sections we will look into different models. The final damage class will then be chosen based on a majority vote of the models.
 
 \section{KNN} % Kasper
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{KNNfn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{,} \hlkwc{nNeighbours}\hlstd{)}
+\hlstd{\{}
+    \hlstd{errKNNcv} \hlkwb{<-} \hlkwd{numeric}\hlstd{(nNeighbours)}
+    \hlcom{# Use leave one out CV of train set to select number of neighbours}
+    \hlkwa{for} \hlstd{(K} \hlkwa{in} \hlkwd{seq_len}\hlstd{(nNeighbours))}
+    \hlstd{\{}
+      \hlstd{KNNpred} \hlkwb{<-} \hlkwd{knn.cv}\hlstd{(}\hlkwc{train} \hlstd{= xTrain,} \hlkwc{cl} \hlstd{= yTrain,} \hlkwc{k} \hlstd{= K)}
+      \hlstd{errKNNcv[K]} \hlkwb{<-} \hlkwd{sum}\hlstd{(}\hlkwd{as.integer}\hlstd{(KNNpred} \hlopt{!=} \hlstd{yTrain))}
+    \hlstd{\}}
+    \hlcom{# The simplest model is the one with the most neighbours}
+    \hlstd{K} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{which}\hlstd{(errKNNcv} \hlopt{==} \hlkwd{min}\hlstd{(errKNNcv)))}
+
+    \hlstd{KNNpred} \hlkwb{<-} \hlkwd{knn}\hlstd{(}\hlkwc{train} \hlstd{= xTrain,} \hlkwc{test} \hlstd{= xTest,} \hlkwc{cl} \hlstd{= yTrain,} \hlkwc{k} \hlstd{= K)}
+    \hlstd{errKNN} \hlkwb{<-} \hlkwd{sum}\hlstd{(}\hlkwd{as.integer}\hlstd{(KNNpred} \hlopt{!=} \hlstd{yTest))}
+    \hlkwd{names}\hlstd{(errKNN)} \hlkwb{<-} \hlstr{"KNN"}
+
+    \hlkwd{print}\hlstd{(K)}
+
+    \hlkwd{list}\hlstd{(}\hlkwc{errorRate} \hlstd{= errKNN,} \hlkwc{predictions} \hlstd{= KNNpred)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
 \section{Logistic regression} % Lars
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{logisticRegressionFn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{)\{}
+    \hlstd{maxVal} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{abs}\hlstd{(xTrain))}
+    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain}\hlopt{/}\hlstd{maxVal))}
+    \hlstd{model} \hlkwb{<-} \hlkwd{multinom}\hlstd{(y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat)}
+    \hlstd{logitPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(model,} \hlkwc{newdata}\hlstd{=} \hlkwd{data.frame}\hlstd{(xTest}\hlopt{/}\hlstd{maxVal),} \hlkwc{type}\hlstd{=}\hlstr{'probs'}\hlstd{)}
+
+    \hlstd{logitPred} \hlkwb{<-} \hlkwd{factor}\hlstd{(}\hlkwd{apply}\hlstd{(logitPred,} \hlnum{1}\hlstd{, which.max)} \hlopt{-} \hlnum{1}\hlstd{,} \hlkwc{levels} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlopt{:}\hlnum{3}\hlstd{))}
+    \hlstd{errLogit} \hlkwb{<-} \hlkwd{sum}\hlstd{(logitPred} \hlopt{!=} \hlstd{yTest)} \hlopt{/} \hlkwd{length}\hlstd{(yTest)}
+    \hlkwd{names}\hlstd{(errLogit)} \hlkwb{<-} \hlstr{"LogisticRegression"}
+
+    \hlkwd{list}\hlstd{(}\hlkwc{errorRate} \hlstd{= errLogit,} \hlkwc{predictions} \hlstd{= logitPred)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
 \section{SVM} % Maya
-\section{CART} % Maja
+
+We used a support vector machine with a linear kernel to build a model from the training data. Then, classes for the test data were predicted and the error rate calculated. The mean error rate for this model was $0.00$, see table \ref{table:meanerror}. For the given training and test data and pre-processing, the SVM is performing very well.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{svmFn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{)\{}
+    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain))}
+    \hlkwd{colnames}\hlstd{(dat)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{'y'}\hlstd{,} \hlkwd{colnames}\hlstd{(xTrain))}
+    \hlstd{model} \hlkwb{<-} \hlkwd{svm}\hlstd{(}\hlkwc{formula} \hlstd{= y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat,} \hlkwc{kernel} \hlstd{=} \hlstr{"linear"}\hlstd{)}
+
+    \hlstd{svmPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(model, xTest)}
+    \hlstd{errSVM} \hlkwb{<-} \hlkwd{sum}\hlstd{(svmPred} \hlopt{!=} \hlstd{yTest)} \hlopt{/} \hlkwd{length}\hlstd{(yTest)}
+    \hlkwd{names}\hlstd{(errSVM)} \hlkwb{<-} \hlstr{"SVM"}
+
+    \hlkwd{list}\hlstd{(}\hlkwc{errorRate} \hlstd{= errSVM,} \hlkwc{predictions} \hlstd{= svmPred)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section{CART} % Maya
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{cartFn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{)}
+\hlstd{\{}
+    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain))}
+    \hlstd{model} \hlkwb{<-} \hlkwd{rpart}\hlstd{(y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat,} \hlkwc{method} \hlstd{=} \hlstr{"class"}\hlstd{)}
+    \hlstd{pfit}\hlkwb{<-} \hlkwd{prune}\hlstd{(model,} \hlkwc{cp}\hlstd{= model}\hlopt{$}\hlstd{cptable[}\hlkwd{which.min}\hlstd{(model}\hlopt{$}\hlstd{cptable[,}\hlstr{"xerror"}\hlstd{]),}\hlstr{"CP"}\hlstd{])}
+
+    \hlstd{cartPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(pfit,} \hlkwc{newdata} \hlstd{=} \hlkwd{data.frame}\hlstd{(xTest),} \hlkwc{type} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"class"}\hlstd{))}
+    \hlstd{errCart} \hlkwb{<-} \hlkwd{sum}\hlstd{(cartPred} \hlopt{!=} \hlstd{yTest)} \hlopt{/} \hlkwd{length}\hlstd{(yTest)}
+    \hlkwd{names}\hlstd{(errCart)} \hlkwb{<-} \hlstr{"CART"}
+
+    \hlkwd{list}\hlstd{(}\hlkwc{errorRate} \hlstd{= errCart,} \hlkwc{predictions} \hlstd{= cartPred)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
 \section{Boosting} % Kasper
 \section{Random Forest} % Lars
 \section{Majority Vote} % 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{doTest} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{,} \hlkwc{f}\hlstd{,} \hlkwc{...}\hlstd{)}
+\hlstd{\{}
+    \hlstd{name} \hlkwb{=} \hlkwd{as.character}\hlstd{(}\hlkwd{substitute}\hlstd{(f))}
+    \hlstd{res} \hlkwb{<-} \hlkwd{with}\hlstd{(dataObject}\hlopt{$}\hlstd{data,} \hlkwd{f}\hlstd{(xTrain, yTrain, xTest, yTest, ...))}
+    \hlstd{dataObject}\hlopt{$}\hlstd{predictions[[name]]} \hlkwb{<-} \hlstd{res}\hlopt{$}\hlstd{predictions}
+    \hlstd{dataObject}\hlopt{$}\hlstd{errorRate} \hlkwb{<-} \hlkwd{c}\hlstd{(dataObject}\hlopt{$}\hlstd{errorRate, res}\hlopt{$}\hlstd{errorRate)}
+    \hlstd{dataObject}
+\hlstd{\}}
+
+\hlstd{majorityVote} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{)}
+\hlstd{\{}
+    \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlkwb{<-} \hlkwd{apply}\hlstd{(}
+      \hlstd{dataObject}\hlopt{$}\hlstd{predictions,} \hlnum{1}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)}\hlkwd{names}\hlstd{(}\hlkwd{which.max}\hlstd{(}\hlkwd{table}\hlstd{(x))))}
+    \hlstd{dataObject}\hlopt{$}\hlstd{errorRate[}\hlstr{"majorityVote"}\hlstd{]} \hlkwb{<-} \hlkwd{sum}\hlstd{(}
+      \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlopt{!=} \hlstd{dataObject}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{yTest)}
+    \hlstd{dataObject}
+\hlstd{\}}
+
+\hlstd{getMeanErrorRates} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataList}\hlstd{)}
+\hlstd{\{}
+    \hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, majorityVote)}
+
+    \hlstd{err} \hlkwb{<-} \hlkwd{do.call}\hlstd{(}\hlstr{'rbind'}\hlstd{,} \hlkwd{lapply}\hlstd{(dataList,} \hlstr{'[['}\hlstd{,} \hlstr{'errorRate'}\hlstd{))}
+    \hlstd{err} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(err)}
+    \hlstd{err}
+\hlstd{\}}
+
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, KNNfn,} \hlkwc{nNeighbours} \hlstd{=} \hlnum{20}\hlstd{)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, logisticRegressionFn)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, svmFn)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, cartFn)}
+
+
+\hlkwd{getMeanErrorRates}\hlstd{(dataList)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+% latex table generated in R 3.2.2 by xtable 1.7-4 package
+% Mon Mar 21 12:08:28 2016
+\begin{table}[ht]
+\centering
+\begin{tabular}{rr}
+  \hline
+ & x \\ 
+  \hline
+KNN & 0.00 \\ 
+  LogisticRegression & 0.01 \\ 
+  SVM & 0.00 \\ 
+  CART & 0.01 \\ 
+  majorityVote & 0.00 \\ 
+   \hline
+\end{tabular}
+\caption{Mean error rates for different models.\label{table:meanerror}} 
+\end{table}
+
 
 \chapter{Dimensions} %
 
-\chapter{Test}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-[1] 2
-\end{verbatim}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/chunkname-1} 
-
-\end{knitrout}
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlnum{1} \hlopt{+} \hlnum{1}
-\end{alltt}
-\begin{verbatim}
-[1] 2
-\end{verbatim}
-\begin{alltt}
-\hlkwd{plot}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlnum{5}\hlstd{),}\hlkwd{seq}\hlstd{(}\hlnum{5}\hlstd{))}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/chunkname-1} 
-\begin{kframe}\begin{alltt}
-\hlcom{# you have to start a chunk with ## ----}
-\hlcom{# and then add the name of the chunk, if you want to have it in another file}
-\hlcom{# then the file has to be read by read_chunk in the beginning}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%% APPENDIX %%%%%
@@ -219,7 +334,8 @@ In the following sections we will look into different models. The final damage c
     \hlstd{y} \hlkwb{<-} \hlkwd{as.data.frame}\hlstd{(}\hlkwd{lapply}\hlstd{(}\hlkwd{levels}\hlstd{(yTrain),} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)} \hlkwd{as.integer}\hlstd{(yTrain} \hlopt{==} \hlstd{x)))}
     \hlstd{pls} \hlkwb{<-} \hlkwd{plsr}\hlstd{(}\hlkwd{as.matrix}\hlstd{(y)} \hlopt{~} \hlstd{xTrain)}
 
-    \hlcom{# shuffle xTrain, do PLS again and find the maximum explained variance by the shuffled data.}
+    \hlcom{# shuffle xTrain, do PLS again and}
+    \hlcom{# find the maximum explained variance by the shuffled data.}
     \hlstd{xShuf} \hlkwb{<-} \hlkwd{apply}\hlstd{(xTrain,} \hlnum{2}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)x[}\hlkwd{sample}\hlstd{(}\hlkwd{length}\hlstd{(x))])}
     \hlstd{plsShuf} \hlkwb{<-} \hlkwd{plsr}\hlstd{(}\hlkwd{as.matrix}\hlstd{(y)} \hlopt{~} \hlstd{xShuf)}
     \hlstd{cutOff} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{explvar}\hlstd{(plsShuf))}
