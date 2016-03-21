@@ -1,3 +1,7 @@
+## ---- test
+1+1
+
+## ---- preprocessing
 library(reshape2)
 library(data.table)
 library(cvTools)
@@ -47,7 +51,8 @@ rotateData <- function(xTrain, yTrain, xTest, yTest)
     y <- as.data.frame(lapply(levels(yTrain), function(x) as.integer(yTrain == x)))
     pls <- plsr(as.matrix(y) ~ xTrain)
     
-    # shuffle xTrain, do PLS again and find the maximum explained variance by the shuffled data.
+    # shuffle xTrain, do PLS again and
+    # find the maximum explained variance by the shuffled data.
     xShuf <- apply(xTrain, 2, function(x)x[sample(length(x))])
     plsShuf <- plsr(as.matrix(y) ~ xShuf)
     cutOff <- max(explvar(plsShuf))

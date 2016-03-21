@@ -21,18 +21,19 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-%\SweaveOpts{concordance=TRUE}
 % Titlepage
 \maketitle
 
 % Rnw options need to be set to knitr, not to Sweave!!
 % knitr setup:
-<<setup, include=FALSE, cache=FALSE>>=
+<<setup, include=FALSE, echo=FALSE, cache=FALSE>>=
   
   # use package knitr and read in used R code,
   # which is in the file case1.R for better overview
   require(knitr)
   read_chunk("case1.R")
+  read_chunk("preProcessing.R")
+  read_chunk("prediction.R")
 
   load("Case1.RData")
 
@@ -76,6 +77,9 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 \section{PLS} % Lars
 
 \chapter{Modeling}
+
+In the following sections we will look into different models. The final damage class will then be chosen based on a majority vote of the models.
+
 \section{KNN} % Kasper
 \section{Logistic regression} % Lars
 \section{SVM} % Maya
@@ -98,5 +102,10 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 %%%%%%%%%%%%%%%%%%%%
 \appendix
 \appendixpage
+
+\chapter{Pre-processing}
+% We don't want the preprocessing to run every time we compile the file, it's only here to show what we have done.
+<<preprocessing, echo=TRUE, eval=FALSE>>=
+@
 
 \end{document}

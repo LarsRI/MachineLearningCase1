@@ -1,4 +1,53 @@
-\documentclass[a4paper,draft=false]{scrreprt}
+\documentclass[a4paper,draft=false]{scrreprt}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -20,31 +69,20 @@
 %\date{\today}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{Sweave}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
-%\SweaveOpts{concordance=TRUE}
 % Titlepage
 \maketitle
 
 % Rnw options need to be set to knitr, not to Sweave!!
 % knitr setup:
-\begin{Schunk}
-\begin{Sinput}
->   # use package knitr and read in used R code,
->   # which is in the file case1.R for better overview
->   require(knitr)
->   read_chunk("case1.R")
->   load("Case1.RData")
->   # preload other packages
->   require(data.table)
-\end{Sinput}
-\end{Schunk}
+
 
 Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\rbrace$ as one long vector with newline separating the observations. The corresponding order is that given in the \mbox{Cas1\_tst} (Xt), and a small report with a brief introduction/abstract, pre-processing, modeling and model assessment, plus your evaluation of the actual dimensions needed to describe the data/problem.
 
 Please note that the deadline is mid-day.
 
-\chapter{Introduction}
+\chapter{Introduction} % Kasper
 
 There are three sensors on an offshore platform, that record data for detecting damage to the platform. Damage can occur at three different sites (see table \ref{table:damageclass}) and for three different intensities ($5\%, 10\%, 15\%$). The recorded data is given in the form of Frequency Response Functions (FRFs).
 
@@ -72,26 +110,147 @@ In this case, $4092$ samples of the three FRFs are given, together with their re
 \end{figure}
 
 \chapter{Pre-processing}
+\section{Cross validation} % Lars
 \section{PLS} % Lars
 
 \chapter{Modeling}
-\section{Cross validation \& Majority Vote} % 
+
+In the following sections we will look into different models. The final damage class will then be chosen based on a majority vote of the models.
+
 \section{KNN} % Kasper
 \section{Logistic regression} % Lars
 \section{SVM} % Maya
-\section{CART} % 
+\section{CART} % Maja
+\section{Boosting} % Kasper
+\section{Random Forest} % Lars
+\section{Majority Vote} % 
 
-
-
-\chapter{Dimensions}
+\chapter{Dimensions} %
 
 \chapter{Test}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+[1] 2
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/chunkname-1} 
 
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlnum{1} \hlopt{+} \hlnum{1}
+\end{alltt}
+\begin{verbatim}
+[1] 2
+\end{verbatim}
+\begin{alltt}
+\hlkwd{plot}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlnum{5}\hlstd{),}\hlkwd{seq}\hlstd{(}\hlnum{5}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/chunkname-1} 
+\begin{kframe}\begin{alltt}
+\hlcom{# you have to start a chunk with ## ----}
+\hlcom{# and then add the name of the chunk, if you want to have it in another file}
+\hlcom{# then the file has to be read by read_chunk in the beginning}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%% APPENDIX %%%%%
 %%%%%%%%%%%%%%%%%%%%
 \appendix
 \appendixpage
+
+\chapter{Pre-processing}
+% We don't want the preprocessing to run every time we compile the file, it's only here to show what we have done.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(reshape2)}
+\hlkwd{library}\hlstd{(data.table)}
+\hlkwd{library}\hlstd{(cvTools)}
+\hlkwd{library}\hlstd{(class)}
+\hlkwd{library}\hlstd{(nnet)}
+\hlkwd{library}\hlstd{(e1071)}
+\hlkwd{library}\hlstd{(pls)}
+\hlkwd{library}\hlstd{(rpart)}
+
+
+\hlkwd{load}\hlstd{(}\hlstr{"Case1.RData"}\hlstd{)}
+
+\hlstd{setup} \hlkwb{<-} \hlkwd{data.table}\hlstd{(}
+    \hlkwc{sensor} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{"S1"}\hlstd{,} \hlstr{"S2"}\hlstd{,} \hlstr{"S3"}\hlstd{),} \hlkwc{each} \hlstd{=} \hlnum{4092}\hlstd{),} \hlnum{2}\hlstd{),}
+    \hlkwc{freq} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{4092}\hlstd{,} \hlnum{6}\hlstd{),}
+    \hlkwc{part} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{"real"}\hlstd{,} \hlstr{"imaginary"}\hlstd{),} \hlkwc{each} \hlstd{=} \hlnum{4092}\hlopt{*}\hlnum{3}\hlstd{)}
+\hlstd{)}
+\hlstd{setup[, idx}\hlkwb{:=}\hlkwd{seq_len}\hlstd{(}\hlkwd{nrow}\hlstd{(setup))]}
+
+
+\hlkwd{set.seed}\hlstd{(}\hlnum{1}\hlstd{)}
+\hlstd{nObs} \hlkwb{<-} \hlkwd{nrow}\hlstd{(Xtr)}
+\hlstd{nFolds} \hlkwb{<-} \hlnum{10}
+\hlstd{folds} \hlkwb{<-} \hlkwd{cvFolds}\hlstd{(nObs, nFolds)}
+
+\hlstd{subsetData} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{i}\hlstd{,} \hlkwc{x}\hlstd{,} \hlkwc{y}\hlstd{,} \hlkwc{folds}\hlstd{)}
+\hlstd{\{}
+    \hlstd{ind} \hlkwb{<-} \hlstd{folds}\hlopt{$}\hlstd{which} \hlopt{==} \hlstd{i}
+    \hlstd{xTrain} \hlkwb{<-} \hlstd{x[}\hlopt{!}\hlstd{ind, ]}
+    \hlstd{yTrain} \hlkwb{<-} \hlstd{y[}\hlopt{!}\hlstd{ind]}
+    \hlstd{xTest} \hlkwb{<-} \hlstd{x[ind, ]}
+    \hlstd{yTest} \hlkwb{<-} \hlstd{y[ind]}
+    \hlkwd{list}\hlstd{(}\hlkwc{xTrain} \hlstd{= xTrain,}
+         \hlkwc{yTrain} \hlstd{= yTrain,}
+         \hlkwc{xTest} \hlstd{= xTest,}
+         \hlkwc{yTest} \hlstd{= yTest)}
+\hlstd{\}}
+
+
+\hlstd{rotateData} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{)}
+\hlstd{\{}
+    \hlcom{# Center, but do no scale x}
+    \hlstd{xTrain} \hlkwb{<-} \hlkwd{scale}\hlstd{(xTrain,} \hlkwc{scale} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+    \hlstd{xTest} \hlkwb{<-} \hlkwd{scale}\hlstd{(xTest,} \hlkwc{center} \hlstd{=} \hlkwd{attr}\hlstd{(xTrain,} \hlstr{"scaled:center"}\hlstd{),} \hlkwc{scale} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+
+    \hlcom{# Reshape y to be a 4 column matrix and do PLS}
+    \hlstd{y} \hlkwb{<-} \hlkwd{as.data.frame}\hlstd{(}\hlkwd{lapply}\hlstd{(}\hlkwd{levels}\hlstd{(yTrain),} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)} \hlkwd{as.integer}\hlstd{(yTrain} \hlopt{==} \hlstd{x)))}
+    \hlstd{pls} \hlkwb{<-} \hlkwd{plsr}\hlstd{(}\hlkwd{as.matrix}\hlstd{(y)} \hlopt{~} \hlstd{xTrain)}
+
+    \hlcom{# shuffle xTrain, do PLS again and find the maximum explained variance by the shuffled data.}
+    \hlstd{xShuf} \hlkwb{<-} \hlkwd{apply}\hlstd{(xTrain,} \hlnum{2}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)x[}\hlkwd{sample}\hlstd{(}\hlkwd{length}\hlstd{(x))])}
+    \hlstd{plsShuf} \hlkwb{<-} \hlkwd{plsr}\hlstd{(}\hlkwd{as.matrix}\hlstd{(y)} \hlopt{~} \hlstd{xShuf)}
+    \hlstd{cutOff} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{explvar}\hlstd{(plsShuf))}
+
+    \hlstd{nComp} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{which}\hlstd{(}\hlkwd{explvar}\hlstd{(pls)} \hlopt{>} \hlstd{cutOff))}
+    \hlstd{pls2} \hlkwb{<-} \hlkwd{plsr}\hlstd{(}\hlkwd{as.matrix}\hlstd{(y)} \hlopt{~} \hlstd{xTrain,} \hlkwc{ncomp} \hlstd{= nComp)}
+    \hlcom{# Select only components with a higher explained variance}
+    \hlstd{xTrainRot} \hlkwb{<-} \hlstd{pls2}\hlopt{$}\hlstd{scores}
+    \hlstd{xTestRot} \hlkwb{<-} \hlkwd{predict}\hlstd{(pls2, xTest,} \hlkwc{type} \hlstd{=} \hlstr{"scores"}\hlstd{)}
+
+    \hlkwd{list}\hlstd{(}\hlkwc{xTrain} \hlstd{= xTrainRot,}
+         \hlkwc{yTrain} \hlstd{= yTrain,}
+         \hlkwc{xTest} \hlstd{= xTestRot,}
+         \hlkwc{yTest} \hlstd{= yTest)}
+\hlstd{\}}
+
+\hlstd{makeSkeleton} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{i}\hlstd{,} \hlkwc{x}\hlstd{,} \hlkwc{y}\hlstd{,} \hlkwc{folds}\hlstd{)}
+\hlstd{\{}
+    \hlstd{data} \hlkwb{<-} \hlkwd{subsetData}\hlstd{(i, x, y, folds)}
+    \hlkwd{list}\hlstd{(}
+        \hlkwc{i} \hlstd{= i,}
+        \hlkwc{data} \hlstd{=} \hlkwd{with}\hlstd{(data,} \hlkwd{rotateData}\hlstd{(xTrain, yTrain, xTest, yTest)),}
+        \hlkwc{predictions} \hlstd{=} \hlkwd{data.frame}\hlstd{(}\hlkwd{matrix}\hlstd{(}\hlkwc{nrow} \hlstd{=} \hlkwd{length}\hlstd{(data}\hlopt{$}\hlstd{yTest),} \hlkwc{ncol} \hlstd{=} \hlnum{0}\hlstd{)),}
+        \hlkwc{errorRate} \hlstd{=} \hlkwd{numeric}\hlstd{()}
+    \hlstd{)}
+\hlstd{\}}
+
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(}\hlkwd{seq_len}\hlstd{(nFolds), makeSkeleton, Xtr, class_tr, folds)}
+\hlkwd{save}\hlstd{(dataList, folds,} \hlkwc{file} \hlstd{=} \hlstr{"preprocessed.RData"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 \end{document}
