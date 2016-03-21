@@ -11,6 +11,8 @@
 
 \usepackage{appendix}
 
+\addto{\captionsenglish}{\renewcommand{\bibname}{R and R packages}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % info to go to titlepage
 \subject{Case 1}
@@ -92,12 +94,13 @@ In the following sections we will look into different models. The final damage c
 @
 
 \section{SVM} % Maya
-
-We used a support vector machine with a linear kernel to build a model from the training data. Then, classes for the test data were predicted and the error rate calculated. The mean error rate for this model was $0.00$, see table \ref{table:meanerror}. For the given training and test data and pre-processing, the SVM is performing very well.
+We used a support vector machine \cite{e1071} with a linear kernel to build a model from the training data. Then, classes for the test data were predicted and the error rate calculated. The mean error rate for this model was $0.00$, see table \ref{table:meanerror}. For the given training and test data and pre-processing, the SVM is performing very well.
 <<svm, echo=TRUE>>=
 @
 
 \section{CART} % Maya
+For the classification and regression trees we used
+
 <<cart, echo=TRUE>>=
 @
 
@@ -123,5 +126,13 @@ We used a support vector machine with a linear kernel to build a model from the 
 % We don't want the preprocessing to run every time we compile the file, it's only here to show what we have done.
 <<preprocessing, echo=TRUE, eval=FALSE>>=
 @
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% BIBLIOGRAPHY %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{packages}
 
 \end{document}

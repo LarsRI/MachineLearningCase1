@@ -60,6 +60,8 @@
 
 \usepackage{appendix}
 
+\addto{\captionsenglish}{\renewcommand{\bibname}{R and R packages}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % info to go to titlepage
 \subject{Case 1}
@@ -168,8 +170,7 @@ In the following sections we will look into different models. The final damage c
 \end{knitrout}
 
 \section{SVM} % Maya
-
-We used a support vector machine with a linear kernel to build a model from the training data. Then, classes for the test data were predicted and the error rate calculated. The mean error rate for this model was $0.00$, see table \ref{table:meanerror}. For the given training and test data and pre-processing, the SVM is performing very well.
+We used a support vector machine \cite{e1071} with a linear kernel to build a model from the training data. Then, classes for the test data were predicted and the error rate calculated. The mean error rate for this model was $0.00$, see table \ref{table:meanerror}. For the given training and test data and pre-processing, the SVM is performing very well.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -189,6 +190,8 @@ We used a support vector machine with a linear kernel to build a model from the 
 \end{knitrout}
 
 \section{CART} % Maya
+For the classification and regression trees we used
+
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -253,7 +256,7 @@ We used a support vector machine with a linear kernel to build a model from the 
 \end{knitrout}
 
 % latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Mon Mar 21 12:08:28 2016
+% Mon Mar 21 12:57:53 2016
 \begin{table}[ht]
 \centering
 \begin{tabular}{rr}
@@ -368,5 +371,13 @@ KNN & 0.00 \\
 \end{alltt}
 \end{kframe}
 \end{knitrout}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% BIBLIOGRAPHY %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{packages}
 
 \end{document}
