@@ -218,12 +218,12 @@ For the final class selection, we compared all model predictions and chose the c
 
 
 % latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Mon Mar 21 14:01:37 2016
+% Mon Mar 21 14:36:24 2016
 \begin{table}[ht]
 \centering
 \begin{tabular}{rr}
   \hline
- & x \\ 
+ & error\_test \\ 
   \hline
 KNN & 0.00 \\ 
   LogisticRegression & 0.01 \\ 
@@ -233,6 +233,22 @@ KNN & 0.00 \\
    \hline
 \end{tabular}
 \caption{Mean error rates for different models over 10-fold cross validation.\label{table:meanerror}} 
+\end{table}
+% latex table generated in R 3.2.2 by xtable 1.7-4 package
+% Mon Mar 21 14:36:24 2016
+\begin{table}[ht]
+\centering
+\begin{tabular}{rr}
+  \hline
+ & stderror\_test \\ 
+  \hline
+KNN & 0.0000000000 \\ 
+  LogisticRegression & 0.0000875977 \\ 
+  SVM & 0.0000000000 \\ 
+  CART & 0.0000875977 \\ 
+   \hline
+\end{tabular}
+\caption{Standard errors for different models over 10-fold cross validation.\label{table:stderror}} 
 \end{table}
 
 
@@ -370,14 +386,14 @@ KNN & 0.00 \\
 \begin{verbatim}
 ## [1] 13
 ## [1] 14
-## [1] 13
-## [1] 13
-## [1] 13
 ## [1] 14
 ## [1] 13
 ## [1] 13
 ## [1] 13
-## [1] 15
+## [1] 13
+## [1] 13
+## [1] 13
+## [1] 16
 \end{verbatim}
 \begin{alltt}
 \hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, logisticRegressionFn)}

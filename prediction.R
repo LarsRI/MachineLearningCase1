@@ -109,7 +109,18 @@ dataList <- lapply(dataList, doTest, cartFn)
 getMeanErrorRates(dataList)
 
 ## ---- meanerror
-
 df  = xtable(as.table(getMeanErrorRates(dataList)))
+colnames(df) = c("error_test")
 caption(df) = "Mean error rates for different models over 10-fold cross validation.\\label{table:meanerror}"
 print(df)
+# calculate standard error for test set
+dataList2 <- lapply(dataList, majorityVote)
+err2 <- do.call('rbind', lapply(dataList, '[[', 'errorRate'))
+se <- colSums((err2 - matrix(rep(colMeans(err2),10),nrow(err2),ncol(err2),byrow=TRUE))^2)/(9*sqrt(10))
+se <- xtable(as.table(se))
+digits(se) <- 10
+colnames(se) = c("stderror_test")
+caption(se) = "Standard errors for different models over 10-fold cross validation.\\label{table:stderror}"
+print(se)
+
+
