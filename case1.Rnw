@@ -43,7 +43,7 @@
   require(xtable)
 @
 
-Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\rbrace$ as one long vector with newline separating the observations. The corresponding order is that given in the \mbox{Cas1\_tst} (Xt), and a small report with a brief introduction/abstract, pre-processing, modeling and model assessment, plus your evaluation of the actual dimensions needed to describe the data/problem.
+Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\rbrace$ as one long vector with newline separating the observations. The corresponding order is that given in the \mbox{Cas1\_tst} (Xt), and a small report with a brief introduction/abstract, pre-processing, modeling and model assessment, plus your evaluation of the actual dimensions needed to describe the data/problem. (Max 5	A4 pages of text)
 
 Please note that the deadline is mid-day.
 
@@ -66,11 +66,11 @@ There are three sensors on an offshore platform, that record data for detecting 
 \end{center}
 \end{table}
 
-In this case, $4092$ samples of the three FRFs are given, together with their respective damage classes. The goal is to form a model to predict damage and damage class.
+In this case, $4092$ samples of the three FRFs for $190$ cases are given, together with their respective damage classes. The goal is to form a model to predict damage and damage class.
 
 \begin{figure}[hb]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{Valdemarplatform}
+\includegraphics[width=0.6\textwidth]{Valdemarplatform}
 \end{center}
 \end{figure}
 
@@ -99,7 +99,7 @@ We used a support vector machine \cite{e1071} with a linear kernel to build a mo
 @
 
 \section{CART} % Maya
-For the classification and regression trees we used
+For the classification and regression trees we used the \verb+rpart+ function to fit a classification tree and \verb+prune+ to prune it, if necessary, \cite{rpart}. The mean error rate for CART was $0.01$, which is slightly worse than for some of the other models, see table \ref{table:meanerror}.
 
 <<cart, echo=TRUE>>=
 @
@@ -107,7 +107,8 @@ For the classification and regression trees we used
 \section{Boosting} % Kasper
 \section{Random Forest} % Lars
 \section{Majority Vote} % 
-<<vote, echo=TRUE, results='hide'>>=
+For the final class selection, we compared all model predictions and chose the class that was predicted by most models. In case of a tie, the first used method (see table \ref{table:meanerror}) would be chosen. For the R-code of the majority vote, please see appendix \ref{appendix:vote}.
+<<vote, echo=FALSE, results='hide'>>=
 @
 
 <<meanerror, echo=FALSE, results='asis'>>=
@@ -127,6 +128,9 @@ For the classification and regression trees we used
 <<preprocessing, echo=TRUE, eval=FALSE>>=
 @
 
+\chapter{Majority vote}\label{appendix:vote}
+<<vote, echo=TRUE>>=
+@
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% BIBLIOGRAPHY %%%%%

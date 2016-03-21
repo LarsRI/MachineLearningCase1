@@ -111,5 +111,5 @@ getMeanErrorRates(dataList)
 ## ---- meanerror
 
 df  = xtable(as.table(getMeanErrorRates(dataList)))
-caption(df) = "Mean error rates for different models.\\label{table:meanerror}"
+caption(df) = "Mean error rates for different models over 10-fold cross validation.\\label{table:meanerror}"
 print(df)

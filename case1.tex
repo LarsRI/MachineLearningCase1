@@ -80,7 +80,7 @@
 % knitr setup:
 
 
-Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\rbrace$ as one long vector with newline separating the observations. The corresponding order is that given in the \mbox{Cas1\_tst} (Xt), and a small report with a brief introduction/abstract, pre-processing, modeling and model assessment, plus your evaluation of the actual dimensions needed to describe the data/problem.
+Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\rbrace$ as one long vector with newline separating the observations. The corresponding order is that given in the \mbox{Cas1\_tst} (Xt), and a small report with a brief introduction/abstract, pre-processing, modeling and model assessment, plus your evaluation of the actual dimensions needed to describe the data/problem. (Max 5	A4 pages of text)
 
 Please note that the deadline is mid-day.
 
@@ -103,11 +103,11 @@ There are three sensors on an offshore platform, that record data for detecting 
 \end{center}
 \end{table}
 
-In this case, $4092$ samples of the three FRFs are given, together with their respective damage classes. The goal is to form a model to predict damage and damage class.
+In this case, $4092$ samples of the three FRFs for $190$ cases are given, together with their respective damage classes. The goal is to form a model to predict damage and damage class.
 
 \begin{figure}[hb]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{Valdemarplatform}
+\includegraphics[width=0.6\textwidth]{Valdemarplatform}
 \end{center}
 \end{figure}
 
@@ -190,7 +190,7 @@ We used a support vector machine \cite{e1071} with a linear kernel to build a mo
 \end{knitrout}
 
 \section{CART} % Maya
-For the classification and regression trees we used
+For the classification and regression trees we used the \verb+rpart+ function to fit a classification tree and \verb+prune+ to prune it, if necessary, \cite{rpart}. The mean error rate for CART was $0.01$, which is slightly worse than for some of the other models, see table \ref{table:meanerror}.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -214,49 +214,11 @@ For the classification and regression trees we used
 \section{Boosting} % Kasper
 \section{Random Forest} % Lars
 \section{Majority Vote} % 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{doTest} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{,} \hlkwc{f}\hlstd{,} \hlkwc{...}\hlstd{)}
-\hlstd{\{}
-    \hlstd{name} \hlkwb{=} \hlkwd{as.character}\hlstd{(}\hlkwd{substitute}\hlstd{(f))}
-    \hlstd{res} \hlkwb{<-} \hlkwd{with}\hlstd{(dataObject}\hlopt{$}\hlstd{data,} \hlkwd{f}\hlstd{(xTrain, yTrain, xTest, yTest, ...))}
-    \hlstd{dataObject}\hlopt{$}\hlstd{predictions[[name]]} \hlkwb{<-} \hlstd{res}\hlopt{$}\hlstd{predictions}
-    \hlstd{dataObject}\hlopt{$}\hlstd{errorRate} \hlkwb{<-} \hlkwd{c}\hlstd{(dataObject}\hlopt{$}\hlstd{errorRate, res}\hlopt{$}\hlstd{errorRate)}
-    \hlstd{dataObject}
-\hlstd{\}}
+For the final class selection, we compared all model predictions and chose the class that was predicted by most models. In case of a tie, the first used method (see table \ref{table:meanerror}) would be chosen. For the R-code of the majority vote, please see appendix \ref{appendix:vote}.
 
-\hlstd{majorityVote} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{)}
-\hlstd{\{}
-    \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlkwb{<-} \hlkwd{apply}\hlstd{(}
-      \hlstd{dataObject}\hlopt{$}\hlstd{predictions,} \hlnum{1}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)}\hlkwd{names}\hlstd{(}\hlkwd{which.max}\hlstd{(}\hlkwd{table}\hlstd{(x))))}
-    \hlstd{dataObject}\hlopt{$}\hlstd{errorRate[}\hlstr{"majorityVote"}\hlstd{]} \hlkwb{<-} \hlkwd{sum}\hlstd{(}
-      \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlopt{!=} \hlstd{dataObject}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{yTest)}
-    \hlstd{dataObject}
-\hlstd{\}}
-
-\hlstd{getMeanErrorRates} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataList}\hlstd{)}
-\hlstd{\{}
-    \hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, majorityVote)}
-
-    \hlstd{err} \hlkwb{<-} \hlkwd{do.call}\hlstd{(}\hlstr{'rbind'}\hlstd{,} \hlkwd{lapply}\hlstd{(dataList,} \hlstr{'[['}\hlstd{,} \hlstr{'errorRate'}\hlstd{))}
-    \hlstd{err} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(err)}
-    \hlstd{err}
-\hlstd{\}}
-
-\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, KNNfn,} \hlkwc{nNeighbours} \hlstd{=} \hlnum{20}\hlstd{)}
-\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, logisticRegressionFn)}
-\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, svmFn)}
-\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, cartFn)}
-
-
-\hlkwd{getMeanErrorRates}\hlstd{(dataList)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
 
 % latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Mon Mar 21 12:57:53 2016
+% Mon Mar 21 14:01:37 2016
 \begin{table}[ht]
 \centering
 \begin{tabular}{rr}
@@ -270,7 +232,7 @@ KNN & 0.00 \\
   majorityVote & 0.00 \\ 
    \hline
 \end{tabular}
-\caption{Mean error rates for different models.\label{table:meanerror}} 
+\caption{Mean error rates for different models over 10-fold cross validation.\label{table:meanerror}} 
 \end{table}
 
 
@@ -372,6 +334,141 @@ KNN & 0.00 \\
 \end{kframe}
 \end{knitrout}
 
+\chapter{Majority vote}\label{appendix:vote}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{doTest} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{,} \hlkwc{f}\hlstd{,} \hlkwc{...}\hlstd{)}
+\hlstd{\{}
+    \hlstd{name} \hlkwb{=} \hlkwd{as.character}\hlstd{(}\hlkwd{substitute}\hlstd{(f))}
+    \hlstd{res} \hlkwb{<-} \hlkwd{with}\hlstd{(dataObject}\hlopt{$}\hlstd{data,} \hlkwd{f}\hlstd{(xTrain, yTrain, xTest, yTest, ...))}
+    \hlstd{dataObject}\hlopt{$}\hlstd{predictions[[name]]} \hlkwb{<-} \hlstd{res}\hlopt{$}\hlstd{predictions}
+    \hlstd{dataObject}\hlopt{$}\hlstd{errorRate} \hlkwb{<-} \hlkwd{c}\hlstd{(dataObject}\hlopt{$}\hlstd{errorRate, res}\hlopt{$}\hlstd{errorRate)}
+    \hlstd{dataObject}
+\hlstd{\}}
+
+\hlstd{majorityVote} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{)}
+\hlstd{\{}
+    \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlkwb{<-} \hlkwd{apply}\hlstd{(}
+      \hlstd{dataObject}\hlopt{$}\hlstd{predictions,} \hlnum{1}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)}\hlkwd{names}\hlstd{(}\hlkwd{which.max}\hlstd{(}\hlkwd{table}\hlstd{(x))))}
+    \hlstd{dataObject}\hlopt{$}\hlstd{errorRate[}\hlstr{"majorityVote"}\hlstd{]} \hlkwb{<-} \hlkwd{sum}\hlstd{(}
+      \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlopt{!=} \hlstd{dataObject}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{yTest)}
+    \hlstd{dataObject}
+\hlstd{\}}
+
+\hlstd{getMeanErrorRates} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataList}\hlstd{)}
+\hlstd{\{}
+    \hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, majorityVote)}
+
+    \hlstd{err} \hlkwb{<-} \hlkwd{do.call}\hlstd{(}\hlstr{'rbind'}\hlstd{,} \hlkwd{lapply}\hlstd{(dataList,} \hlstr{'[['}\hlstd{,} \hlstr{'errorRate'}\hlstd{))}
+    \hlstd{err} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(err)}
+    \hlstd{err}
+\hlstd{\}}
+
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, KNNfn,} \hlkwc{nNeighbours} \hlstd{=} \hlnum{20}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 13
+## [1] 14
+## [1] 13
+## [1] 13
+## [1] 13
+## [1] 14
+## [1] 13
+## [1] 13
+## [1] 13
+## [1] 15
+\end{verbatim}
+\begin{alltt}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, logisticRegressionFn)}
+\end{alltt}
+\begin{verbatim}
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.706105
+## iter  20 value 0.009737
+## iter  30 value 0.002467
+## final  value 0.000090 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.573304
+## iter  20 value 0.042724
+## iter  30 value 0.000305
+## final  value 0.000078 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.410803
+## iter  20 value 0.004693
+## iter  30 value 0.000727
+## final  value 0.000084 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.911910
+## iter  20 value 0.030692
+## iter  30 value 0.000778
+## final  value 0.000075 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.716921
+## iter  20 value 0.057360
+## iter  30 value 0.000271
+## final  value 0.000070 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.728738
+## iter  20 value 0.037782
+## iter  30 value 0.000495
+## final  value 0.000048 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.823359
+## iter  20 value 0.053523
+## iter  30 value 0.000331
+## final  value 0.000085 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.648413
+## iter  20 value 0.067015
+## iter  30 value 0.000232
+## final  value 0.000059 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.723918
+## iter  20 value 0.022144
+## final  value 0.000079 
+## converged
+## # weights:  24 (15 variable)
+## initial  value 237.056336 
+## iter  10 value 1.658182
+## iter  20 value 0.020666
+## final  value 0.000072 
+## converged
+\end{verbatim}
+\begin{alltt}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, svmFn)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, cartFn)}
+
+
+\hlkwd{getMeanErrorRates}\hlstd{(dataList)}
+\end{alltt}
+\begin{verbatim}
+##                KNN LogisticRegression                SVM 
+##        0.000000000        0.005263158        0.000000000 
+##               CART                KNN LogisticRegression 
+##        0.005263158        0.000000000        0.005263158 
+##                SVM               CART       majorityVote 
+##        0.000000000        0.005263158        0.000000000
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% BIBLIOGRAPHY %%%%%
