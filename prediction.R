@@ -170,6 +170,8 @@ testObject <- doTest(testObject, boost)
 testObject <- doTest(testObject, rnForest)
 testObject <- majorityVote(testObject)
 
+write(testObject$predictions$majorityVote, file = "yhat.txt")
+
 pD <- data.frame(unclass(testObject$data$xTrain), class = testObject$data$yTrain, type = 'Train')
 pD <- rbind(pD, data.frame(unclass(testObject$data$xTest), class = testObject$predictions$majorityVote, type = 'Test'))
 colnames(pD) <- c('1', '2', '3', '4', 'class', 'type')
