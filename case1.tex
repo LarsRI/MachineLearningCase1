@@ -102,11 +102,11 @@ Due to the fairly large amount of attributes the first and likely most important
 
 In this case, $4092$ samples of the three FRFs for $190$ cases are given, together with their respective damage classes. The goal is to form a model to predict damage and damage class.
 
-\begin{figure}[hb]
-\begin{center}
-\includegraphics[width=0.6\textwidth]{Valdemarplatform}
-\end{center}
-\end{figure}
+%\begin{figure}[hb]
+%\begin{center}
+%\includegraphics[width=0.6\textwidth]{Valdemarplatform}
+%\end{center}
+%\end{figure}
 
 {\let\clearpage\relax \chapter{Pre-processing}}
 Overfitting was controlled using a 10-fold cross validation, splitting the data into xTest, xTrain, yTest and yTrain. The folds were generated using \verb+cvTools+\cite{cvTools}. In each fold xTrain was centered (but not scaled) and a PLS model was fitted to the training data (xTrain and yTrain), using \verb+pls+\cite{pls}. The rows of each column in xTrain were shuffled and a second PLS model was fitted using the shuffled (randomized) xTrain. In the first PLS the components with an explained variance greater then the largest explained variance of the shuffled PLS were kept, in all folds the number of components kept were 4. Finally xTest was centered using the centers calculated on xTrain, and xTrain and xTest were rotated using the 4 components selected. 
@@ -252,7 +252,7 @@ For the final class selection, we compared all model predictions and chose the c
 
 
 % latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Sun Mar 27 18:01:10 2016
+% Sun Mar 27 18:22:50 2016
 \begin{table}[ht]
 \centering
 \scalebox{0.6}{
@@ -273,7 +273,7 @@ KNN & 0.00 \\
 \caption{Mean error rates for different models over 10-fold cross validation.\label{table:meanerror}} 
 \end{table}
 % latex table generated in R 3.2.2 by xtable 1.7-4 package
-% Sun Mar 27 18:01:10 2016
+% Sun Mar 27 18:22:50 2016
 \begin{table}[ht]
 \centering
 \scalebox{0.6}{

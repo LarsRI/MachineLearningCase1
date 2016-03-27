@@ -66,11 +66,11 @@ Due to the fairly large amount of attributes the first and likely most important
 
 In this case, $4092$ samples of the three FRFs for $190$ cases are given, together with their respective damage classes. The goal is to form a model to predict damage and damage class.
 
-\begin{figure}[hb]
-\begin{center}
-\includegraphics[width=0.6\textwidth]{Valdemarplatform}
-\end{center}
-\end{figure}
+%\begin{figure}[hb]
+%\begin{center}
+%\includegraphics[width=0.6\textwidth]{Valdemarplatform}
+%\end{center}
+%\end{figure}
 
 {\let\clearpage\relax \chapter{Pre-processing}}
 Overfitting was controlled using a 10-fold cross validation, splitting the data into xTest, xTrain, yTest and yTrain. The folds were generated using \verb+cvTools+\cite{cvTools}. In each fold xTrain was centered (but not scaled) and a PLS model was fitted to the training data (xTrain and yTrain), using \verb+pls+\cite{pls}. The rows of each column in xTrain were shuffled and a second PLS model was fitted using the shuffled (randomized) xTrain. In the first PLS the components with an explained variance greater then the largest explained variance of the shuffled PLS were kept, in all folds the number of components kept were 4. Finally xTest was centered using the centers calculated on xTrain, and xTrain and xTest were rotated using the 4 components selected. 
