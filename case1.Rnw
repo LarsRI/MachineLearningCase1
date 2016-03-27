@@ -50,6 +50,7 @@ Please note that the deadline is mid-day.
 \chapter{Introduction} % Kasper
 
 There are three sensors on an offshore platform, that record data for detecting damage to the platform. Damage can occur at three different sites (see table \ref{table:damageclass}) and for three different intensities ($5\%, 10\%, 15\%$). The recorded data is given in the form of Frequency Response Functions (FRFs).
+Due to the fairly large amount of attributes the first and likely most important step in this case is dimension reduction. Section 2 describes the pre-processing steps we went through to reach an acceptable reduction in dimensions. Subsequently, as explained in section 3 and 4, we subjected the data to all appropriate models taught in the course and we selected the final damage class by the means of majority vote of the models.   
 
 \begin{table}[ht]
 \begin{center}
@@ -74,11 +75,10 @@ In this case, $4092$ samples of the three FRFs for $190$ cases are given, togeth
 \end{center}
 \end{figure}
 
-\chapter{Pre-processing}
-\section{Cross validation} % Lars
-\section{PLS} % Lars
+{\let\clearpage\relax \chapter{Pre-processing}}
+Overfitting was controlled using a 10-fold cross validation, splitting the data into xTest, xTrain, yTest and yTrain. The folds were generated using \verb+cvTools+\cite{cvTools}. In each fold xTrain was centered (but not scaled) and a PLS model was fitted to the training data (xTrain and yTrain), using \verb+pls+\cite{pls}. The rows of each column in xTrain were shuffled and a second PLS model was fitted using the shuffled (randomized) xTrain. In the first PLS the components with an explained variance greater then the largest explained variance of the shuffled PLS were kept, in all folds the number of components kept were 4. Finally xTest was centered using the centers calculated on xTrain, and xTrain and xTest were rotated using the 4 components selected. 
 
-\chapter{Modeling}
+{\let\clearpage\relax \chapter{Modeling}}
 % These are not included, but are needed for reference
 <<startprediction, include=FALSE, echo=FALSE, warning=FALSE>>=
 @
@@ -86,10 +86,12 @@ In this case, $4092$ samples of the three FRFs for $190$ cases are given, togeth
 In the following sections we will look into different models. The final damage class will then be chosen based on a majority vote of the models.
 
 \section{KNN} % Kasper
+The first model we introduce is KNN. When applying KNN, finding an appropriate number of neighbors (k) is crucial. When k is too low the model is disposed to over fitting, hence we seek to find the simplest model which is the one with the highest k and lowest error rate. The appropriate number of neighbors is found with the means of leave one out cross validation on the training data. In this case the appropriate k varies from 13 to 16, but was 13 in 7 out of 10 folds. KNN performed very well with a mean error rate of 0.00, see table \ref{table:meanerror}.
 <<knn, echo=TRUE>>=
 @
 
 \section{Logistic regression} % Lars
+The logistic regression was performed using the \verb+multinom+ function \cite{nnet}. To speed up the computation the variables were scaled from -1 to 1. The model is capable of simultaneously classifying all four cases. The error rate of the logistic regression was $0.005$, see table \ref{table:meanerror}, corresponding to a single misclassified observation.
 <<logreg, echo=TRUE>>=
 @
 
@@ -105,6 +107,7 @@ For the classification and regression trees we used the \verb+rpart+ function to
 @
 
 \section{Boosting} % Kasper
+Performing Classification tree with Boosting is an ensample method founded on bootstrapping (sampling with replacement). Boosting threes are grown in an adaptive manner where weights are put on misclassifications in order to reduce bias. Hence, output is a weighted average of all the trees which have been grown. Mean error rate for Booting in our case is ???, see table \ref{table:meanerror}.
 \section{Random Forest} % Lars
 \section{Majority Vote} % 
 For the final class selection, we compared all model predictions and chose the class that was predicted by most models. In case of a tie, the first used method (see table \ref{table:meanerror}) would be chosen. For the R-code of the majority vote, please see appendix \ref{appendix:vote}.
@@ -114,8 +117,7 @@ For the final class selection, we compared all model predictions and chose the c
 <<meanerror, echo=FALSE, results='asis'>>=
 @
 
-\chapter{Dimensions} %
-
+{\let\clearpage\relax \chapter{Dimensions}}
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%% APPENDIX %%%%%
@@ -123,7 +125,7 @@ For the final class selection, we compared all model predictions and chose the c
 \appendix
 \appendixpage
 
-\chapter{Pre-processing}
+\chapter{Pre-processing Code}
 % We don't want the preprocessing to run every time we compile the file, it's only here to show what we have done.
 <<preprocessing, echo=TRUE, eval=FALSE>>=
 @
