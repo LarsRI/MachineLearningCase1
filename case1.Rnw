@@ -38,14 +38,11 @@
   read_chunk("prediction.R")
 
   load("Case1.RData")
+  load("Case1_tst.RData")
 
   # preload other packages
   require(xtable)
 @
-
-Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\rbrace$ as one long vector with newline separating the observations. The corresponding order is that given in the \mbox{Cas1\_tst} (Xt), and a small report with a brief introduction/abstract, pre-processing, modeling and model assessment, plus your evaluation of the actual dimensions needed to describe the data/problem. (Max 5	A4 pages of text)
-
-Please note that the deadline is mid-day.
 
 \chapter{Introduction} % Kasper
 
@@ -85,8 +82,9 @@ Overfitting was controlled using a 10-fold cross validation, splitting the data 
 
 In the following sections we will look into different models. The final damage class will then be chosen based on a majority vote of the models.
 
+
 \section{KNN} % Kasper
-The first model we introduce is KNN. When applying KNN, finding an appropriate number of neighbors (k) is crucial. When k is too low the model is disposed to over fitting, hence we seek to find the simplest model which is the one with the highest k and lowest error rate. The appropriate number of neighbors is found with the means of leave one out cross validation on the training data. In this case the appropriate k varies from 13 to 16, but was 13 in 7 out of 10 folds. KNN performed very well with a mean error rate of 0.00, see table \ref{table:meanerror}.
+The first model we introduce is KNN. When applying KNN, finding an appropriate number of neighbors (k) is crucial. When k is too low the model is disposed to over fitting, hence we seek to find the simplest model which is the one with the highest k and lowest error rate. The appropriate number of neighbors is found with the means of leave one out cross validation on the training data. In this case the appropriate k varies from 13 to 16, but was 13 in 7 out of 10 folds. KNN performed very well with a mean error rate of 0.00, see table \ref{table:meanerror}. In the final classification the k chosen was 15. 
 <<knn, echo=TRUE>>=
 @
 
@@ -101,16 +99,25 @@ We used a support vector machine \cite{e1071} with a linear kernel to build a mo
 @
 
 \section{CART} % Maya
-For the classification and regression trees we used the \verb+rpart+ function to fit a classification tree and \verb+prune+ to prune it, if necessary, \cite{rpart}. The mean error rate for CART was $0.01$, which is slightly worse than for some of the other models, see table \ref{table:meanerror}.
+For the classification and regression trees we used the \verb+rpart+ function to fit a classification tree and \verb+prune+ to prune it, if necessary, \cite{rpart}. The mean error rate for CART was $0.005$, which is slightly worse than for some of the other models, see table \ref{table:meanerror}.
 
 <<cart, echo=TRUE>>=
 @
 
 \section{Boosting} % Kasper
-Performing Classification tree with Boosting is an ensample method founded on bootstrapping (sampling with replacement). Boosting threes are grown in an adaptive manner where weights are put on misclassifications in order to reduce bias. Hence, output is a weighted average of all the trees which have been grown. Mean error rate for Booting in our case is ???, see table \ref{table:meanerror}.
+Performing Classification tree with Boosting is an ensample method founded on bootstrapping (sampling with replacement). Boosting threes are grown in an adaptive manner where weights are put on misclassifications in order to reduce bias. Hence, output is a weighted average of all the trees which have been grown. Mean error rate for Booting in our case is $0.005$, see table \ref{table:meanerror}.
+<<boosting, echo=TRUE>>=
+@
+
+
 \section{Random Forest} % Lars
+Finally random forrest classification was performed. 500 trees were grown using 1/3 of the variables and about 2/3 of the samples for each tree. The mean error rate for the random forest was $0.005$.
+<<randomForest, echo=TRUE>>=
+@
+
+
 \section{Majority Vote} % 
-For the final class selection, we compared all model predictions and chose the class that was predicted by most models. In case of a tie, the first used method (see table \ref{table:meanerror}) would be chosen. For the R-code of the majority vote, please see appendix \ref{appendix:vote}.
+For the final class selection, we compared all model predictions and chose the class that was predicted by most models. In case of a tie, the first used method (see table \ref{table:meanerror}) would be chosen. For the R-code of the majority vote, please see appendix \ref{appendix:vote}. Surprisingly the majority vote performed worse than KNN and SVM, since a single observation was misclassified as type 0 in 4 of the 7 methods tested.
 <<vote, echo=FALSE, results='hide'>>=
 @
 
@@ -118,6 +125,15 @@ For the final class selection, we compared all model predictions and chose the c
 @
 
 {\let\clearpage\relax \chapter{Dimensions}}
+It is intuitively pleasing that 4 dimensions were chosen to represent the data, since there are 4 classes. Howerver, while the dimensions separate the data quite well, the individual classes does not have a dimension that caputres their features, with the exception of class 0 that is separated from the other classes by the first dimension. A visualization of the 4 dimension can be seen in figure \ref{fig:visualizations}
+
+\begin{figure}[hb]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{visualization}
+\caption{Visualization of the four dimensions.\label{fig:visualizations}}
+\end{center}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%% APPENDIX %%%%%

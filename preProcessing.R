@@ -1,26 +1,10 @@
-## ---- test
-1+1
-
 ## ---- preprocessing
 library(reshape2)
 library(data.table)
 library(cvTools)
-library(class)
-library(nnet)
-library(e1071)
-library(pls)
-library(rpart)
-
+library(R.matlab)
 
 load("Case1.RData")
-
-setup <- data.table(
-    sensor = rep(rep(c("S1", "S2", "S3"), each = 4092), 2),
-    freq = rep(1:4092, 6),
-    part = rep(c("real", "imaginary"), each = 4092*3)
-)
-setup[, idx:=seq_len(nrow(setup))]
-
 
 set.seed(1)
 nObs <- nrow(Xtr)
@@ -82,3 +66,13 @@ makeSkeleton <- function(i, x, y, folds)
 
 dataList <- lapply(seq_len(nFolds), makeSkeleton, Xtr, class_tr, folds)
 save(dataList, folds, file = "preprocessed.RData")
+
+
+## ---- testData
+dat <- readMat('Case1_tst.mat')
+xFinal <- dat$Xt
+
+testObject <- list()
+testObject$predictions = data.frame(matrix(nrow = nrow(xFinal), ncol = 0))
+testObject$data <- rotateData(Xtr, class_tr, xFinal, 'Unknown')
+save(testObject, file = "Case1_tst.RData")
