@@ -89,7 +89,7 @@ The first model we introduce is KNN. When applying KNN, finding an appropriate n
 @
 
 \section{Logistic regression} % Lars
-The logistic regression was performed using the \verb+multinom+ function \cite{nnet}. To speed up the computation the variables were scaled from -1 to 1. The model is capable of simultaneously classifying all four cases. The error rate of the logistic regression was $0.005$, see table \ref{table:meanerror}, corresponding to a single misclassified observation.
+The logistic regression was performed using the \verb+multinom+ function \cite{class_nnet}. To speed up the computation the variables were scaled from -1 to 1. The model is capable of simultaneously classifying all four cases. The error rate of the logistic regression was $0.005$, see table \ref{table:meanerror}, corresponding to a single misclassified observation.
 <<logreg, echo=TRUE>>=
 @
 
@@ -118,7 +118,7 @@ Finally random forrest classification was performed. 500 trees were grown using 
 
 \section{Majority Vote} % 
 For the final class selection, we compared all model predictions and chose the class that was predicted by most models. In case of a tie, the first used method (see table \ref{table:meanerror}) would be chosen. For the R-code of the majority vote, please see appendix \ref{appendix:vote}. Surprisingly the majority vote performed worse than KNN and SVM, since a single observation was misclassified as type 0 in 4 of the 7 methods tested.
-<<vote, echo=FALSE, results='hide'>>=
+<<vote, echo=FALSE, results='hide', cache=TRUE>>=
 @
 
 <<meanerror, echo=FALSE, results='asis'>>=
@@ -147,7 +147,7 @@ It is intuitively pleasing that 4 dimensions were chosen to represent the data, 
 @
 
 \chapter{Majority vote}\label{appendix:vote}
-<<vote, echo=TRUE>>=
+<<vote, echo=TRUE, cache=TRUE>>=
 @
 
 %%%%%%%%%%%%%%%%%%%%%%%%
