@@ -80,10 +80,6 @@
 % knitr setup:
 
 
-Please upload a file \verb+yhat.txt+ containing predictions $\lbrace 0, 1, 2, 3\rbrace$ as one long vector with newline separating the observations. The corresponding order is that given in the \mbox{Cas1\_tst} (Xt), and a small report with a brief introduction/abstract, pre-processing, modeling and model assessment, plus your evaluation of the actual dimensions needed to describe the data/problem. (Max 5	A4 pages of text)
-
-Please note that the deadline is mid-day.
-
 \chapter{Introduction} % Kasper
 
 There are three sensors on an offshore platform, that record data for detecting damage to the platform. Damage can occur at three different sites (see table \ref{table:damageclass}) and for three different intensities ($5\%, 10\%, 15\%$). The recorded data is given in the form of Frequency Response Functions (FRFs).
@@ -121,51 +117,50 @@ Overfitting was controlled using a 10-fold cross validation, splitting the data 
 
 In the following sections we will look into different models. The final damage class will then be chosen based on a majority vote of the models.
 
+
 \section{KNN} % Kasper
-The first model we introduce is KNN. When applying KNN, finding an appropriate number of neighbors (k) is crucial. When k is too low the model is disposed to over fitting, hence we seek to find the simplest model which is the one with the highest k and lowest error rate. The appropriate number of neighbors is found with the means of leave one out cross validation on the training data. In this case the appropriate k varies from 13 to 16, but was 13 in 7 out of 10 folds. KNN performed very well with a mean error rate of 0.00, see table \ref{table:meanerror}.
+The first model we introduce is KNN. When applying KNN, finding an appropriate number of neighbors (k) is crucial. When k is too low the model is disposed to over fitting, hence we seek to find the simplest model which is the one with the highest k and lowest error rate. The appropriate number of neighbors is found with the means of leave one out cross validation on the training data. In this case the appropriate k varies from 13 to 16, but was 13 in 7 out of 10 folds. KNN performed very well with a mean error rate of 0.00, see table \ref{table:meanerror}. In the final classification the k chosen was 15. 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{KNNfn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{,} \hlkwc{nNeighbours}\hlstd{)}
+\hlstd{KNN} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{nNeighbours}\hlstd{)}
 \hlstd{\{}
-    \hlstd{errKNNcv} \hlkwb{<-} \hlkwd{numeric}\hlstd{(nNeighbours)}
-    \hlcom{# Use leave one out CV of train set to select number of neighbours}
-    \hlkwa{for} \hlstd{(K} \hlkwa{in} \hlkwd{seq_len}\hlstd{(nNeighbours))}
-    \hlstd{\{}
-      \hlstd{KNNpred} \hlkwb{<-} \hlkwd{knn.cv}\hlstd{(}\hlkwc{train} \hlstd{= xTrain,} \hlkwc{cl} \hlstd{= yTrain,} \hlkwc{k} \hlstd{= K)}
-      \hlstd{errKNNcv[K]} \hlkwb{<-} \hlkwd{sum}\hlstd{(}\hlkwd{as.integer}\hlstd{(KNNpred} \hlopt{!=} \hlstd{yTrain))}
-    \hlstd{\}}
-    \hlcom{# The simplest model is the one with the most neighbours}
-    \hlstd{K} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{which}\hlstd{(errKNNcv} \hlopt{==} \hlkwd{min}\hlstd{(errKNNcv)))}
+  \hlkwd{require}\hlstd{(class)}
+  \hlstd{errKNNcv} \hlkwb{<-} \hlkwd{numeric}\hlstd{(nNeighbours)}
+  \hlcom{# Use leave one out CV of train set to select number of neighbours}
+  \hlkwa{for} \hlstd{(K} \hlkwa{in} \hlkwd{seq_len}\hlstd{(nNeighbours))}
+  \hlstd{\{}
+    \hlstd{KNNpred} \hlkwb{<-} \hlkwd{knn.cv}\hlstd{(}\hlkwc{train} \hlstd{= xTrain,} \hlkwc{cl} \hlstd{= yTrain,} \hlkwc{k} \hlstd{= K)}
+    \hlstd{errKNNcv[K]} \hlkwb{<-} \hlkwd{sum}\hlstd{(}\hlkwd{as.integer}\hlstd{(KNNpred} \hlopt{!=} \hlstd{yTrain))}
+  \hlstd{\}}
+  \hlcom{# The simplest model is the one with the most neighbours}
+  \hlstd{K} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{which}\hlstd{(errKNNcv} \hlopt{==} \hlkwd{min}\hlstd{(errKNNcv)))}
 
-    \hlstd{KNNpred} \hlkwb{<-} \hlkwd{knn}\hlstd{(}\hlkwc{train} \hlstd{= xTrain,} \hlkwc{test} \hlstd{= xTest,} \hlkwc{cl} \hlstd{= yTrain,} \hlkwc{k} \hlstd{= K)}
-    \hlstd{errKNN} \hlkwb{<-} \hlkwd{sum}\hlstd{(}\hlkwd{as.integer}\hlstd{(KNNpred} \hlopt{!=} \hlstd{yTest))}
-    \hlkwd{names}\hlstd{(errKNN)} \hlkwb{<-} \hlstr{"KNN"}
+  \hlstd{KNNpred} \hlkwb{<-} \hlkwd{knn}\hlstd{(}\hlkwc{train} \hlstd{= xTrain,} \hlkwc{test} \hlstd{= xTest,} \hlkwc{cl} \hlstd{= yTrain,} \hlkwc{k} \hlstd{= K)}
+  \hlkwd{print}\hlstd{(K)}
 
-    \hlkwd{print}\hlstd{(K)}
-
-    \hlkwd{list}\hlstd{(}\hlkwc{errorRate} \hlstd{= errKNN,} \hlkwc{predictions} \hlstd{= KNNpred)}
+  \hlstd{KNNpred}
 \hlstd{\}}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
 
 \section{Logistic regression} % Lars
-The logistic regression was performed using the \verb+multinom+ function \cite{nnet}. To speed up the computation the variables were scaled from -1 to 1. The model is capable of simultaneously classifying all four cases. The error rate of the logistic regression was $0.005$, see table \ref{table:meanerror}, corresponding to a single misclassified observation.
+The logistic regression was performed using the \verb+multinom+ function \cite{class_nnet}. To speed up the computation the variables were scaled from -1 to 1. The model is capable of simultaneously classifying all four cases. The error rate of the logistic regression was $0.005$, see table \ref{table:meanerror}, corresponding to a single misclassified observation.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{logisticRegressionFn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{)\{}
-    \hlstd{maxVal} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{abs}\hlstd{(xTrain))}
-    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain}\hlopt{/}\hlstd{maxVal))}
-    \hlstd{model} \hlkwb{<-} \hlkwd{multinom}\hlstd{(y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat)}
-    \hlstd{logitPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(model,} \hlkwc{newdata}\hlstd{=} \hlkwd{data.frame}\hlstd{(xTest}\hlopt{/}\hlstd{maxVal),} \hlkwc{type}\hlstd{=}\hlstr{'probs'}\hlstd{)}
+\hlstd{logisticRegression} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{)}
+\hlstd{\{}
+  \hlkwd{require}\hlstd{(nnet)}
+  \hlstd{maxVal} \hlkwb{<-} \hlkwd{max}\hlstd{(}\hlkwd{abs}\hlstd{(xTrain))}
+  \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain}\hlopt{/}\hlstd{maxVal))}
+  \hlstd{model} \hlkwb{<-} \hlkwd{multinom}\hlstd{(y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat)}
+  \hlstd{logitPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(model,} \hlkwc{newdata}\hlstd{=} \hlkwd{data.frame}\hlstd{(xTest}\hlopt{/}\hlstd{maxVal),} \hlkwc{type}\hlstd{=}\hlstr{'probs'}\hlstd{)}
 
-    \hlstd{logitPred} \hlkwb{<-} \hlkwd{factor}\hlstd{(}\hlkwd{apply}\hlstd{(logitPred,} \hlnum{1}\hlstd{, which.max)} \hlopt{-} \hlnum{1}\hlstd{,} \hlkwc{levels} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlopt{:}\hlnum{3}\hlstd{))}
-    \hlstd{errLogit} \hlkwb{<-} \hlkwd{sum}\hlstd{(logitPred} \hlopt{!=} \hlstd{yTest)} \hlopt{/} \hlkwd{length}\hlstd{(yTest)}
-    \hlkwd{names}\hlstd{(errLogit)} \hlkwb{<-} \hlstr{"LogisticRegression"}
+  \hlstd{logitPred} \hlkwb{<-} \hlkwd{factor}\hlstd{(}\hlkwd{apply}\hlstd{(logitPred,} \hlnum{1}\hlstd{, which.max)} \hlopt{-} \hlnum{1}\hlstd{,} \hlkwc{levels} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlopt{:}\hlnum{3}\hlstd{))}
 
-    \hlkwd{list}\hlstd{(}\hlkwc{errorRate} \hlstd{= errLogit,} \hlkwc{predictions} \hlstd{= logitPred)}
+  \hlstd{logitPred}
 \hlstd{\}}
 \end{alltt}
 \end{kframe}
@@ -176,86 +171,140 @@ We used a support vector machine \cite{e1071} with a linear kernel to build a mo
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{svmFn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{)\{}
-    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain))}
-    \hlkwd{colnames}\hlstd{(dat)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{'y'}\hlstd{,} \hlkwd{colnames}\hlstd{(xTrain))}
-    \hlstd{model} \hlkwb{<-} \hlkwd{svm}\hlstd{(}\hlkwc{formula} \hlstd{= y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat,} \hlkwc{kernel} \hlstd{=} \hlstr{"linear"}\hlstd{)}
+\hlstd{SVM} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{)}
+\hlstd{\{}
+  \hlkwd{require}\hlstd{(e1071)}
+  \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain))}
+  \hlkwd{colnames}\hlstd{(dat)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{'y'}\hlstd{,} \hlkwd{colnames}\hlstd{(xTrain))}
+  \hlstd{model} \hlkwb{<-} \hlkwd{svm}\hlstd{(}\hlkwc{formula} \hlstd{= y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat,} \hlkwc{kernel} \hlstd{=} \hlstr{"linear"}\hlstd{)}
 
-    \hlstd{svmPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(model, xTest)}
-    \hlstd{errSVM} \hlkwb{<-} \hlkwd{sum}\hlstd{(svmPred} \hlopt{!=} \hlstd{yTest)} \hlopt{/} \hlkwd{length}\hlstd{(yTest)}
-    \hlkwd{names}\hlstd{(errSVM)} \hlkwb{<-} \hlstr{"SVM"}
+  \hlstd{svmPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(model, xTest)}
 
-    \hlkwd{list}\hlstd{(}\hlkwc{errorRate} \hlstd{= errSVM,} \hlkwc{predictions} \hlstd{= svmPred)}
+  \hlstd{svmPred}
 \hlstd{\}}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
 
 \section{CART} % Maya
-For the classification and regression trees we used the \verb+rpart+ function to fit a classification tree and \verb+prune+ to prune it, if necessary, \cite{rpart}. The mean error rate for CART was $0.01$, which is slightly worse than for some of the other models, see table \ref{table:meanerror}.
+For the classification and regression trees we used the \verb+rpart+ function to fit a classification tree and \verb+prune+ to prune it, if necessary, \cite{rpart}. The mean error rate for CART was $0.005$, which is slightly worse than for some of the other models, see table \ref{table:meanerror}.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{cartFn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{,} \hlkwc{yTest}\hlstd{)}
+\hlstd{cart} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{)}
 \hlstd{\{}
-    \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain))}
-    \hlstd{model} \hlkwb{<-} \hlkwd{rpart}\hlstd{(y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat,} \hlkwc{method} \hlstd{=} \hlstr{"class"}\hlstd{)}
-    \hlstd{pfit}\hlkwb{<-} \hlkwd{prune}\hlstd{(model,} \hlkwc{cp}\hlstd{= model}\hlopt{$}\hlstd{cptable[}\hlkwd{which.min}\hlstd{(model}\hlopt{$}\hlstd{cptable[,}\hlstr{"xerror"}\hlstd{]),}\hlstr{"CP"}\hlstd{])}
+  \hlkwd{require}\hlstd{(rpart)}
+  \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain))}
+  \hlstd{model} \hlkwb{<-} \hlkwd{rpart}\hlstd{(y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat,} \hlkwc{method} \hlstd{=} \hlstr{"class"}\hlstd{)}
+  \hlstd{pfit}\hlkwb{<-} \hlkwd{prune}\hlstd{(model,} \hlkwc{cp}\hlstd{= model}\hlopt{$}\hlstd{cptable[}\hlkwd{which.min}\hlstd{(model}\hlopt{$}\hlstd{cptable[,}\hlstr{"xerror"}\hlstd{]),}\hlstr{"CP"}\hlstd{])}
 
-    \hlstd{cartPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(pfit,} \hlkwc{newdata} \hlstd{=} \hlkwd{data.frame}\hlstd{(xTest),} \hlkwc{type} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"class"}\hlstd{))}
-    \hlstd{errCart} \hlkwb{<-} \hlkwd{sum}\hlstd{(cartPred} \hlopt{!=} \hlstd{yTest)} \hlopt{/} \hlkwd{length}\hlstd{(yTest)}
-    \hlkwd{names}\hlstd{(errCart)} \hlkwb{<-} \hlstr{"CART"}
+  \hlstd{cartPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(pfit,} \hlkwc{newdata} \hlstd{=} \hlkwd{data.frame}\hlstd{(xTest),} \hlkwc{type} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"class"}\hlstd{))}
 
-    \hlkwd{list}\hlstd{(}\hlkwc{errorRate} \hlstd{= errCart,} \hlkwc{predictions} \hlstd{= cartPred)}
+  \hlstd{cartPred}
 \hlstd{\}}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
 
 \section{Boosting} % Kasper
-Performing Classification tree with Boosting is an ensample method founded on bootstrapping (sampling with replacement). Boosting threes are grown in an adaptive manner where weights are put on misclassifications in order to reduce bias. Hence, output is a weighted average of all the trees which have been grown. Mean error rate for Booting in our case is ???, see table \ref{table:meanerror}.
+Performing Classification tree with Boosting is an ensample method founded on bootstrapping (sampling with replacement). Boosting threes are grown in an adaptive manner where weights are put on misclassifications in order to reduce bias. Hence, output is a weighted average of all the trees which have been grown. Mean error rate for Booting in our case is $0.005$, see table \ref{table:meanerror}.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{boost} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{)}
+\hlstd{\{}
+  \hlkwd{require}\hlstd{(adabag)}
+  \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain))}
+  \hlstd{model} \hlkwb{<-} \hlkwd{boosting}\hlstd{(y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat)}
+
+  \hlstd{boostPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(model,} \hlkwc{newdata} \hlstd{=} \hlkwd{data.frame}\hlstd{(xTest))}\hlopt{$}\hlstd{class}
+
+  \hlstd{boostPred}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
 \section{Random Forest} % Lars
+Finally random forrest classification was performed. 500 trees were grown using 1/3 of the variables and about 2/3 of the samples for each tree. The mean error rate for the random forest was $0.005$.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{rnForest} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{xTrain}\hlstd{,} \hlkwc{yTrain}\hlstd{,} \hlkwc{xTest}\hlstd{)}
+\hlstd{\{}
+  \hlkwd{require}\hlstd{(randomForest)}
+  \hlstd{dat} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{y} \hlstd{= yTrain,} \hlkwd{unclass}\hlstd{(xTrain))}
+  \hlstd{model} \hlkwb{<-} \hlkwd{randomForest}\hlstd{(y} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= dat)}
+
+  \hlstd{randomForestPred} \hlkwb{<-} \hlkwd{predict}\hlstd{(model,} \hlkwc{newdata} \hlstd{=} \hlkwd{data.frame}\hlstd{(xTest))}
+
+  \hlstd{randomForestPred}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
 \section{Majority Vote} % 
-For the final class selection, we compared all model predictions and chose the class that was predicted by most models. In case of a tie, the first used method (see table \ref{table:meanerror}) would be chosen. For the R-code of the majority vote, please see appendix \ref{appendix:vote}.
+For the final class selection, we compared all model predictions and chose the class that was predicted by most models. In case of a tie, the first used method (see table \ref{table:meanerror}) would be chosen. For the R-code of the majority vote, please see appendix \ref{appendix:vote}. Surprisingly the majority vote performed worse than KNN and SVM, since a single observation was misclassified as type 0 in 4 of the 7 methods tested.
 
 
-% latex table generated in R 3.2.4 by xtable 1.8-2 package
-% Sat Mar 26 21:47:28 2016
+% latex table generated in R 3.2.2 by xtable 1.7-4 package
+% Sun Mar 27 18:01:10 2016
 \begin{table}[ht]
 \centering
+\scalebox{0.6}{
 \begin{tabular}{rr}
   \hline
  & error\_test \\ 
   \hline
 KNN & 0.00 \\ 
-  LogisticRegression & 0.01 \\ 
+  logisticRegression & 0.01 \\ 
   SVM & 0.00 \\ 
-  CART & 0.01 \\ 
-  majorityVote & 0.00 \\ 
+  cart & 0.01 \\ 
+  boost & 0.01 \\ 
+  rnForest & 0.01 \\ 
+  majorityVote & 0.01 \\ 
    \hline
 \end{tabular}
+}
 \caption{Mean error rates for different models over 10-fold cross validation.\label{table:meanerror}} 
 \end{table}
-% latex table generated in R 3.2.4 by xtable 1.8-2 package
-% Sat Mar 26 21:47:28 2016
+% latex table generated in R 3.2.2 by xtable 1.7-4 package
+% Sun Mar 27 18:01:10 2016
 \begin{table}[ht]
 \centering
+\scalebox{0.6}{
 \begin{tabular}{rr}
   \hline
  & stderror\_test \\ 
   \hline
 KNN & 0.0000000000 \\ 
-  LogisticRegression & 0.0000875977 \\ 
+  logisticRegression & 0.0000875977 \\ 
   SVM & 0.0000000000 \\ 
-  CART & 0.0000875977 \\ 
+  cart & 0.0000875977 \\ 
+  boost & 0.0000875977 \\ 
+  rnForest & 0.0000875977 \\ 
+  majorityVote & 0.0000875977 \\ 
    \hline
 \end{tabular}
+}
 \caption{Standard errors for different models over 10-fold cross validation.\label{table:stderror}} 
 \end{table}
 
 
 {\let\clearpage\relax \chapter{Dimensions}}
+It is intuitively pleasing that 4 dimensions were chosen to represent the data, since there are 4 classes. Howerver, while the dimensions separate the data quite well, the individual classes does not have a dimension that caputres their features, with the exception of class 0 that is separated from the other classes by the first dimension. A visualization of the 4 dimension can be seen in figure \ref{fig:visualizations}
+
+\begin{figure}[hb]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{visualization}
+\caption{Visualization of the four dimensions.\label{fig:visualizations}}
+\end{center}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%% APPENDIX %%%%%
@@ -271,22 +320,9 @@ KNN & 0.0000000000 \\
 \hlkwd{library}\hlstd{(reshape2)}
 \hlkwd{library}\hlstd{(data.table)}
 \hlkwd{library}\hlstd{(cvTools)}
-\hlkwd{library}\hlstd{(class)}
-\hlkwd{library}\hlstd{(nnet)}
-\hlkwd{library}\hlstd{(e1071)}
-\hlkwd{library}\hlstd{(pls)}
-\hlkwd{library}\hlstd{(rpart)}
-
+\hlkwd{library}\hlstd{(R.matlab)}
 
 \hlkwd{load}\hlstd{(}\hlstr{"Case1.RData"}\hlstd{)}
-
-\hlstd{setup} \hlkwb{<-} \hlkwd{data.table}\hlstd{(}
-    \hlkwc{sensor} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{"S1"}\hlstd{,} \hlstr{"S2"}\hlstd{,} \hlstr{"S3"}\hlstd{),} \hlkwc{each} \hlstd{=} \hlnum{4092}\hlstd{),} \hlnum{2}\hlstd{),}
-    \hlkwc{freq} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{4092}\hlstd{,} \hlnum{6}\hlstd{),}
-    \hlkwc{part} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{"real"}\hlstd{,} \hlstr{"imaginary"}\hlstd{),} \hlkwc{each} \hlstd{=} \hlnum{4092}\hlopt{*}\hlnum{3}\hlstd{)}
-\hlstd{)}
-\hlstd{setup[, idx}\hlkwb{:=}\hlkwd{seq_len}\hlstd{(}\hlkwd{nrow}\hlstd{(setup))]}
-
 
 \hlkwd{set.seed}\hlstd{(}\hlnum{1}\hlstd{)}
 \hlstd{nObs} \hlkwb{<-} \hlkwd{nrow}\hlstd{(Xtr)}
@@ -358,47 +394,50 @@ KNN & 0.0000000000 \\
 \begin{alltt}
 \hlstd{doTest} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{,} \hlkwc{f}\hlstd{,} \hlkwc{...}\hlstd{)}
 \hlstd{\{}
-    \hlstd{name} \hlkwb{=} \hlkwd{as.character}\hlstd{(}\hlkwd{substitute}\hlstd{(f))}
-    \hlstd{res} \hlkwb{<-} \hlkwd{with}\hlstd{(dataObject}\hlopt{$}\hlstd{data,} \hlkwd{f}\hlstd{(xTrain, yTrain, xTest, yTest, ...))}
-    \hlstd{dataObject}\hlopt{$}\hlstd{predictions[[name]]} \hlkwb{<-} \hlstd{res}\hlopt{$}\hlstd{predictions}
-    \hlstd{dataObject}\hlopt{$}\hlstd{errorRate} \hlkwb{<-} \hlkwd{c}\hlstd{(dataObject}\hlopt{$}\hlstd{errorRate, res}\hlopt{$}\hlstd{errorRate)}
-    \hlstd{dataObject}
+  \hlstd{name} \hlkwb{<-} \hlkwd{as.character}\hlstd{(}\hlkwd{substitute}\hlstd{(f))}
+  \hlstd{res} \hlkwb{<-} \hlkwd{with}\hlstd{(dataObject}\hlopt{$}\hlstd{data,} \hlkwd{f}\hlstd{(xTrain, yTrain, xTest, ...))}
+  \hlstd{dataObject}\hlopt{$}\hlstd{predictions[[name]]} \hlkwb{<-} \hlstd{res}
+  \hlstd{dataObject}
 \hlstd{\}}
 
 \hlstd{majorityVote} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{)}
 \hlstd{\{}
-    \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlkwb{<-} \hlkwd{apply}\hlstd{(}
-      \hlstd{dataObject}\hlopt{$}\hlstd{predictions,} \hlnum{1}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)}\hlkwd{names}\hlstd{(}\hlkwd{which.max}\hlstd{(}\hlkwd{table}\hlstd{(x))))}
-    \hlstd{dataObject}\hlopt{$}\hlstd{errorRate[}\hlstr{"majorityVote"}\hlstd{]} \hlkwb{<-} \hlkwd{sum}\hlstd{(}
-      \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlopt{!=} \hlstd{dataObject}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{yTest)}
-    \hlstd{dataObject}
+  \hlstd{dataObject}\hlopt{$}\hlstd{predictions}\hlopt{$}\hlstd{majorityVote} \hlkwb{<-} \hlkwd{apply}\hlstd{(}
+    \hlstd{dataObject}\hlopt{$}\hlstd{predictions,} \hlnum{1}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)}\hlkwd{names}\hlstd{(}\hlkwd{which.max}\hlstd{(}\hlkwd{table}\hlstd{(x))))}
+  \hlstd{dataObject}
+\hlstd{\}}
+
+\hlstd{getErrorRates} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataObject}\hlstd{)}
+\hlstd{\{}
+  \hlstd{yTest} \hlkwb{<-} \hlstd{dataObject}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{yTest}
+  \hlstd{nTest} \hlkwb{<-} \hlkwd{length}\hlstd{(yTest)}
+  \hlstd{dataObject}\hlopt{$}\hlstd{errorRate} \hlkwb{<-} \hlkwd{apply}\hlstd{(dataObject}\hlopt{$}\hlstd{predictions,} \hlnum{2}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}\hlkwd{sum}\hlstd{(x} \hlopt{!=} \hlstd{yTest)}\hlopt{/}\hlstd{nTest\})}
+  \hlstd{dataObject}
 \hlstd{\}}
 
 \hlstd{getMeanErrorRates} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{dataList}\hlstd{)}
 \hlstd{\{}
-    \hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, majorityVote)}
-
-    \hlstd{err} \hlkwb{<-} \hlkwd{do.call}\hlstd{(}\hlstr{'rbind'}\hlstd{,} \hlkwd{lapply}\hlstd{(dataList,} \hlstr{'[['}\hlstd{,} \hlstr{'errorRate'}\hlstd{))}
-    \hlstd{err} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(err)}
-    \hlstd{err}
+  \hlstd{err} \hlkwb{<-} \hlkwd{do.call}\hlstd{(}\hlstr{'rbind'}\hlstd{,} \hlkwd{lapply}\hlstd{(dataList,} \hlstr{'[['}\hlstd{,} \hlstr{'errorRate'}\hlstd{))}
+  \hlstd{err} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(err)}
+  \hlstd{err}
 \hlstd{\}}
 
-\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, KNNfn,} \hlkwc{nNeighbours} \hlstd{=} \hlnum{20}\hlstd{)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, KNN,} \hlkwc{nNeighbours} \hlstd{=} \hlnum{20}\hlstd{)}
 \end{alltt}
 \begin{verbatim}
+## [1] 13
+## [1] 13
 ## [1] 13
 ## [1] 14
 ## [1] 13
 ## [1] 13
 ## [1] 13
+## [1] 14
 ## [1] 13
-## [1] 13
-## [1] 13
-## [1] 13
-## [1] 15
+## [1] 16
 \end{verbatim}
 \begin{alltt}
-\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, logisticRegressionFn)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, logisticRegression)}
 \end{alltt}
 \begin{verbatim}
 ## # weights:  24 (15 variable)
@@ -471,19 +510,23 @@ KNN & 0.0000000000 \\
 ## converged
 \end{verbatim}
 \begin{alltt}
-\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, svmFn)}
-\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, cartFn)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, SVM)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, cart)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, boost)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, doTest, rnForest)}
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, majorityVote)}
 
+\hlstd{dataList} \hlkwb{<-} \hlkwd{lapply}\hlstd{(dataList, getErrorRates)}
 
 \hlkwd{getMeanErrorRates}\hlstd{(dataList)}
 \end{alltt}
 \begin{verbatim}
-##                KNN LogisticRegression                SVM 
+##                KNN logisticRegression                SVM 
 ##        0.000000000        0.005263158        0.000000000 
-##               CART                KNN LogisticRegression 
-##        0.005263158        0.000000000        0.005263158 
-##                SVM               CART       majorityVote 
-##        0.000000000        0.005263158        0.000000000
+##               cart              boost           rnForest 
+##        0.005263158        0.005263158        0.005263158 
+##       majorityVote 
+##        0.005263158
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
